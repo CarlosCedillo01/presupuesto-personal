@@ -1,23 +1,27 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Simulador de Presupuesto Personal - Registra ingresos, gastos, presupuestos y metas de ahorro.">
+    <meta name="description"
+        content="Simulador de Presupuesto Personal - Registra ingresos, gastos, presupuestos y metas de ahorro.">
     <title>💰 Presupuesto Personal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <!-- Header -->
     <header id="app-header">
         <div class="header-left">
             <div class="logo">💰</div>
             <div>
-                <h1>Presupuesto Personal</h1>
+                <h1>Finanzas Express</h1>
                 <p class="header-subtitle">Simulador de finanzas · <span class="guest-badge">👤 Modo Invitado</span></p>
             </div>
         </div>
@@ -78,7 +82,8 @@
                             <label for="bg-limit">Límite mensual ($)</label>
                             <input type="number" id="bg-limit" min="1" step="0.01" placeholder="0.00" required>
                         </div>
-                        <button type="submit" class="btn btn-secondary" id="btn-set-budget">Establecer Presupuesto</button>
+                        <button type="submit" class="btn btn-secondary" id="btn-set-budget">Establecer
+                            Presupuesto</button>
                     </form>
                 </div>
                 <!-- Formulario de Transacción -->
@@ -127,7 +132,8 @@
                                 <input type="date" id="tx-date" required>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary" id="btn-add-transaction">Agregar Transacción</button>
+                        <button type="submit" class="btn btn-primary" id="btn-add-transaction">Agregar
+                            Transacción</button>
                     </form>
                 </div>
             </div>
@@ -195,13 +201,17 @@
             <!-- Charts -->
             <div class="grid-2col">
                 <div class="card" id="card-expense-chart">
-                    <div class="card-header"><h2>🍩 Gastos por Categoría</h2></div>
+                    <div class="card-header">
+                        <h2>🍩 Gastos por Categoría</h2>
+                    </div>
                     <div class="chart-container">
                         <canvas id="expense-pie-chart"></canvas>
                     </div>
                 </div>
                 <div class="card" id="card-budget-chart">
-                    <div class="card-header"><h2>📊 Presupuesto vs Gasto Real</h2></div>
+                    <div class="card-header">
+                        <h2>📊 Presupuesto vs Gasto Real</h2>
+                    </div>
                     <div class="chart-container">
                         <canvas id="budget-bar-chart"></canvas>
                     </div>
@@ -210,7 +220,9 @@
 
             <!-- Budget Progress -->
             <div class="card" id="card-budget-progress">
-                <div class="card-header"><h2>🎯 Progreso de Presupuesto</h2></div>
+                <div class="card-header">
+                    <h2>🎯 Progreso de Presupuesto</h2>
+                </div>
                 <div id="budget-progress-list" class="budget-progress-list"></div>
             </div>
         </section>
@@ -231,7 +243,9 @@
 
             <!-- Income Chart -->
             <div class="card" id="card-income-chart">
-                <div class="card-header"><h2>💵 Distribución de Ingresos</h2></div>
+                <div class="card-header">
+                    <h2>💵 Distribución de Ingresos</h2>
+                </div>
                 <div class="chart-container">
                     <canvas id="income-pie-chart"></canvas>
                 </div>
@@ -239,7 +253,9 @@
 
             <!-- Recommendations -->
             <div class="card" id="card-recommendations">
-                <div class="card-header"><h2>💡 Recomendaciones</h2></div>
+                <div class="card-header">
+                    <h2>💡 Recomendaciones</h2>
+                </div>
                 <div id="recommendations-list" class="recommendations-list"></div>
             </div>
         </section>
@@ -250,4 +266,5 @@
 
     <script src="app.js"></script>
 </body>
+
 </html>
