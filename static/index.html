@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simulador de Presupuesto Personal - Registra ingresos, gastos, presupuestos y metas de ahorro.">
+    <title>💰 Presupuesto Personal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header id="app-header">
+        <div class="header-left">
+            <div class="logo">💰</div>
+            <div>
+                <h1>Presupuesto Personal</h1>
+                <p class="header-subtitle">Simulador de finanzas · <span class="guest-badge">👤 Modo Invitado</span></p>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="month-selector">
+                <label for="global-month">Mes:</label>
+                <input type="month" id="global-month">
+            </div>
+        </div>
+    </header>
+
+    <!-- Alerts Banner -->
+    <div id="alerts-banner" class="alerts-banner hidden"></div>
+
+    <!-- Tabs Navigation -->
+    <nav id="tabs-nav" class="tabs-nav">
+        <button class="tab-btn active" data-tab="registrar" id="tab-btn-registrar">
+            <span class="tab-icon">📝</span>
+            <span class="tab-label">Registrar</span>
+        </button>
+        <button class="tab-btn" data-tab="resumen" id="tab-btn-resumen">
+            <span class="tab-icon">📊</span>
+            <span class="tab-label">Resumen</span>
+        </button>
+        <button class="tab-btn" data-tab="reporte" id="tab-btn-reporte">
+            <span class="tab-icon">📋</span>
+            <span class="tab-label">Reporte</span>
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+        <!-- ==================== TAB: REGISTRAR ==================== -->
+        <section id="tab-registrar" class="tab-content active">
+            <div class="grid-2col">
+                <!-- Formulario de Presupuesto -->
+                <div class="card" id="card-budget-form">
+                    <div class="card-header">
+                        <h2>🎯 Establecer Presupuesto</h2>
+                    </div>
+                    <form id="budget-form" class="form">
+                        <div class="form-group">
+                            <label for="bg-category">Categoría</label>
+                            <select id="bg-category" required>
+                                <option value="Alimentación">🍔 Alimentación</option>
+                                <option value="Transporte">🚗 Transporte</option>
+                                <option value="Entretenimiento">🎬 Entretenimiento</option>
+                                <option value="Educación">📚 Educación</option>
+                                <option value="Salud">🏥 Salud</option>
+                                <option value="Vivienda">🏠 Vivienda</option>
+                                <option value="Ropa">👕 Ropa</option>
+                                <option value="Servicios">💡 Servicios</option>
+                                <option value="Otro">📦 Otro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="bg-limit">Límite mensual ($)</label>
+                            <input type="number" id="bg-limit" min="1" step="0.01" placeholder="0.00" required>
+                        </div>
+                        <button type="submit" class="btn btn-secondary" id="btn-set-budget">Establecer Presupuesto</button>
+                    </form>
+                </div>
+                <!-- Formulario de Transacción -->
+                <div class="card" id="card-transaction-form">
+                    <div class="card-header">
+                        <h2>➕ Nueva Transacción</h2>
+                    </div>
+                    <form id="transaction-form" class="form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tx-type">Tipo</label>
+                                <select id="tx-type" required>
+                                    <option value="gasto">🔴 Gasto</option>
+                                    <option value="ingreso">🟢 Ingreso</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="tx-category">Categoría</label>
+                                <select id="tx-category" required>
+                                    <option value="Alimentación">🍔 Alimentación</option>
+                                    <option value="Transporte">🚗 Transporte</option>
+                                    <option value="Entretenimiento">🎬 Entretenimiento</option>
+                                    <option value="Educación">📚 Educación</option>
+                                    <option value="Salud">🏥 Salud</option>
+                                    <option value="Vivienda">🏠 Vivienda</option>
+                                    <option value="Ropa">👕 Ropa</option>
+                                    <option value="Servicios">💡 Servicios</option>
+                                    <option value="Salario">💼 Salario</option>
+                                    <option value="Freelance">💻 Freelance</option>
+                                    <option value="Inversiones">📈 Inversiones</option>
+                                    <option value="Otro">📦 Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="tx-description">Descripción</label>
+                            <input type="text" id="tx-description" placeholder="Ej: Compra en supermercado">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tx-amount">Monto ($)</label>
+                                <input type="number" id="tx-amount" min="0.01" step="0.01" placeholder="0.00" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tx-date">Fecha</label>
+                                <input type="date" id="tx-date" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="btn-add-transaction">Agregar Transacción</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Caja de Ahorro -->
+            <div class="card" id="card-savings">
+                <div class="card-header">
+                    <h2>🏦 Caja de Ahorro</h2>
+                </div>
+                <form id="savings-form" class="form">
+                    <div class="form-row form-row-3">
+                        <div class="form-group">
+                            <label for="sv-name">Meta</label>
+                            <input type="text" id="sv-name" placeholder="Ej: Laptop nueva" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="sv-target">Monto objetivo ($)</label>
+                            <input type="number" id="sv-target" min="1" step="0.01" placeholder="0.00" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="sv-deadline">Fecha límite</label>
+                            <input type="date" id="sv-deadline">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-accent" id="btn-add-savings">Crear Meta de Ahorro</button>
+                </form>
+                <div id="savings-goals-list" class="savings-goals-list"></div>
+            </div>
+
+            <!-- Transacciones recientes -->
+            <div class="card" id="card-recent-transactions">
+                <div class="card-header">
+                    <h2>🕐 Transacciones Recientes</h2>
+                </div>
+                <div id="transactions-list" class="transactions-list"></div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB: RESUMEN ==================== -->
+        <section id="tab-resumen" class="tab-content">
+            <!-- KPIs -->
+            <div class="kpi-grid" id="kpi-grid">
+                <div class="kpi-card kpi-income" id="kpi-income">
+                    <div class="kpi-icon">📈</div>
+                    <div class="kpi-value" id="kpi-income-value">$0</div>
+                    <div class="kpi-label">Ingresos</div>
+                </div>
+                <div class="kpi-card kpi-expense" id="kpi-expense">
+                    <div class="kpi-icon">📉</div>
+                    <div class="kpi-value" id="kpi-expense-value">$0</div>
+                    <div class="kpi-label">Gastos</div>
+                </div>
+                <div class="kpi-card kpi-balance" id="kpi-balance">
+                    <div class="kpi-icon">💰</div>
+                    <div class="kpi-value" id="kpi-balance-value">$0</div>
+                    <div class="kpi-label">Balance</div>
+                </div>
+                <div class="kpi-card kpi-savings" id="kpi-savings-rate">
+                    <div class="kpi-icon">🏦</div>
+                    <div class="kpi-value" id="kpi-savings-value">0%</div>
+                    <div class="kpi-label">Tasa de Ahorro</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid-2col">
+                <div class="card" id="card-expense-chart">
+                    <div class="card-header"><h2>🍩 Gastos por Categoría</h2></div>
+                    <div class="chart-container">
+                        <canvas id="expense-pie-chart"></canvas>
+                    </div>
+                </div>
+                <div class="card" id="card-budget-chart">
+                    <div class="card-header"><h2>📊 Presupuesto vs Gasto Real</h2></div>
+                    <div class="chart-container">
+                        <canvas id="budget-bar-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Budget Progress -->
+            <div class="card" id="card-budget-progress">
+                <div class="card-header"><h2>🎯 Progreso de Presupuesto</h2></div>
+                <div id="budget-progress-list" class="budget-progress-list"></div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB: REPORTE ==================== -->
+        <section id="tab-reporte" class="tab-content">
+            <div class="card" id="card-report-summary">
+                <div class="card-header">
+                    <h2>📋 Reporte del Mes</h2>
+                    <button class="btn btn-export" id="btn-export-csv">
+                        <span>📥</span> Exportar CSV
+                    </button>
+                </div>
+
+                <!-- Report Summary Table -->
+                <div class="report-summary" id="report-summary-table"></div>
+            </div>
+
+            <!-- Income Chart -->
+            <div class="card" id="card-income-chart">
+                <div class="card-header"><h2>💵 Distribución de Ingresos</h2></div>
+                <div class="chart-container">
+                    <canvas id="income-pie-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="card" id="card-recommendations">
+                <div class="card-header"><h2>💡 Recomendaciones</h2></div>
+                <div id="recommendations-list" class="recommendations-list"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
