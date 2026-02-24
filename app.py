@@ -30,6 +30,9 @@ def get_transactions():
     transactions = db.get_transactions(user_id=1, month=month)
     return jsonify(transactions)
 
+"""Punto de enlace (Endpoint) que traduce datos de SQL a JSON.
+    1. Consulta las transacciones en la base de datos SQL.
+    2. Convierte el resultado a formato JSON para el frontend. """
 
 @app.route('/api/transactions', methods=['POST'])
 def add_transaction():
