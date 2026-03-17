@@ -6,6 +6,7 @@ para el Simulador de Presupuesto Personal.
 import sqlite3
 import os
 from datetime import datetime, date
+from werkzeug.security import generate_password_hash, check_password_hash
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "budget.db")
 
@@ -27,6 +28,13 @@ def init_db():
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS credentials (
+            user_id INTEGER PRIMARY KEY,
+            username TEXT NOT NULL UNIQUE,
+            password_hash TEXT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id)
         );
 
         CREATE TABLE IF NOT EXISTS transactions (
@@ -62,11 +70,30 @@ def init_db():
         );
     """)
 
-    # Verificar si ya existe el usuario invitado
-    user = cur.execute("SELECT id FROM users WHERE id = 1").fetchone()
-    if not user:
-        cur.execute("INSERT INTO users (id, name) VALUES (1, 'Invitado')")
-        _load_demo_data(cur)
+    # Usuarios predefinidos: (id, nombre, username, contraseña)
+    PREDEFINED_USERS = [
+        (1, 'Usuario 01', 'usuario01', 'finanzas2024'),
+        (2, 'Usuario 02', 'usuario02', 'express2024'),
+    ]
+
+    for uid, name, username, password in PREDEFINED_USERS:
+        user = cur.execute("SELECT id FROM users WHERE id = ?", (uid,)).fetchone()
+        if not user:
+            cur.execute("INSERT INTO users (id, name) VALUES (?, ?)", (uid, name))
+            cur.execute(
+                "INSERT INTO credentials (user_id, username, password_hash) VALUES (?, ?, ?)",
+                (uid, username, generate_password_hash(password))
+            )
+            if uid == 1:
+                _load_demo_data(cur)
+        else:
+            # Asegurar que existan las credenciales aunque ya existiera el usuario
+            cred = cur.execute("SELECT user_id FROM credentials WHERE user_id = ?", (uid,)).fetchone()
+            if not cred:
+                cur.execute(
+                    "INSERT INTO credentials (user_id, username, password_hash) VALUES (?, ?, ?)",
+                    (uid, username, generate_password_hash(password))
+                )
 
     conn.commit()
     conn.close()
@@ -249,6 +276,39 @@ def deposit_to_goal(goal_id, amount, user_id=1):
 def delete_savings_goal(goal_id, user_id=1):
     conn = get_connection()
     conn.execute("DELETE FROM savings_goals WHERE id = ? AND user_id = ?", (goal_id, user_id))
+    conn.commit()
+    conn.close()
+
+
+# ============================================================
+# Autenticación
+# ============================================================
+
+def verify_credentials(username, password):
+    """Verifica usuario y contraseña. Retorna el user_id si son válidos, None si no."""
+    conn = get_connection()
+    row = conn.execute(
+        """SELECT c.user_id, c.password_hash
+           FROM credentials c
+           WHERE c.username = ?""",
+        (username,)
+    ).fetchone()
+    conn.close()
+    if row and check_password_hash(row['password_hash'], password):
+        return row['user_id']
+    return None
+
+
+# ============================================================
+# Reset de datos
+# ============================================================
+
+def reset_user_data(user_id=1):
+    """Elimina todas las transacciones, presupuestos y metas de ahorro del usuario."""
+    conn = get_connection()
+    conn.execute("DELETE FROM transactions WHERE user_id = ?", (user_id,))
+    conn.execute("DELETE FROM budgets WHERE user_id = ?", (user_id,))
+    conn.execute("DELETE FROM savings_goals WHERE user_id = ?", (user_id,))
     conn.commit()
     conn.close()
 

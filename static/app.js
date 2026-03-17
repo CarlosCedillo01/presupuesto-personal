@@ -32,7 +32,33 @@ let incomePieChart = null;
 // Init
 // ============================================================
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Verificar sesión activa antes de cargar la app
+    try {
+        const res = await fetch('/api/me');
+        if (!res.ok) {
+            window.location.href = '/login';
+            return;
+        }
+        const me = await res.json();
+        const headerUsername = document.getElementById('header-username');
+        if (headerUsername) {
+            headerUsername.textContent = `👤 ${me.username}`;
+        }
+    } catch {
+        window.location.href = '/login';
+        return;
+    }
+
+    // Botón cerrar sesión
+    const btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', async () => {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/login';
+        });
+    }
+
     initMonthSelector();
     initTabs();
     initForms();
@@ -159,6 +185,9 @@ function initForms() {
         window.open(`/api/export/csv?month=${month}`, '_blank');
         showToast('Exportando CSV...', 'info');
     });
+
+    // Reset Data
+    document.getElementById('btn-reset-data').addEventListener('click', () => resetData());
 }
 
 // ============================================================
@@ -670,6 +699,19 @@ function renderRecommendations(recommendations) {
 // ============================================================
 // Actions
 // ============================================================
+
+async function resetData() {
+    if (!confirm('⚠️ ¿Estás seguro de que quieres borrar TODOS los movimientos?\n\nEsto eliminará todas las transacciones, presupuestos y metas de ahorro.\nEsta acción no se puede deshacer.')) return;
+
+    try {
+        const res = await fetch('/api/reset', { method: 'POST' });
+        if (!res.ok) throw new Error((await res.json()).error);
+        showToast('Todos los datos han sido reiniciados', 'success');
+        loadAllData();
+    } catch (err) {
+        showToast(`Error: ${err.message}`, 'error');
+    }
+}
 
 async function deleteTransaction(id) {
     if (!confirm('¿Eliminar esta transacción?')) return;

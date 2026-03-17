@@ -22,10 +22,17 @@
             <div class="logo">💰</div>
             <div>
                 <h1>Finanzas Express</h1>
-                <p class="header-subtitle">Simulador de finanzas · <span class="guest-badge">👤 Modo Invitado</span></p>
+                <p class="header-subtitle">Simulador de finanzas · <span class="guest-badge" id="header-username">👤
+                        Cargando...</span></p>
             </div>
         </div>
         <div class="header-right">
+            <button class="btn btn-reset" id="btn-reset-data" title="Borrar todos los movimientos">
+                🗑️ Reiniciar Datos
+            </button>
+            <button class="btn btn-logout" id="btn-logout" title="Cerrar sesión">
+                🔑 Cerrar Sesión
+            </button>
             <div class="month-selector">
                 <label for="global-month">Mes:</label>
                 <input type="month" id="global-month">
@@ -114,6 +121,7 @@
                                     <option value="Salario">💼 Salario</option>
                                     <option value="Freelance">💻 Freelance</option>
                                     <option value="Inversiones">📈 Inversiones</option>
+                                    <option value="Caja de Ahorro">🏦 Caja de Ahorro</option>
                                     <option value="Otro">📦 Otro</option>
                                 </select>
                             </div>

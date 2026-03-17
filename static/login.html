@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Iniciar sesión en Finanzas Express">
+    <title>💰 Finanzas Express · Iniciar Sesión</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="login-body">
+    <div class="login-bg">
+        <div class="login-blob login-blob-1"></div>
+        <div class="login-blob login-blob-2"></div>
+    </div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Header -->
+            <div class="login-header">
+                <div class="login-logo">💰</div>
+                <h1 class="login-title">Finanzas Express</h1>
+                <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
+            </div>
+
+            <!-- Form -->
+            <form id="login-form" class="login-form" autocomplete="off">
+                <div class="login-form-group">
+                    <label for="login-username">Usuario</label>
+                    <div class="login-input-wrapper">
+                        <span class="login-input-icon">👤</span>
+                        <input type="text" id="login-username" name="username" placeholder="Ingresa tu usuario" required
+                            autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="login-form-group">
+                    <label for="login-password">Contraseña</label>
+                    <div class="login-input-wrapper">
+                        <span class="login-input-icon">🔒</span>
+                        <input type="password" id="login-password" name="password" placeholder="Ingresa tu contraseña"
+                            required autocomplete="current-password">
+                        <button type="button" class="login-toggle-password" id="toggle-password"
+                            title="Mostrar/ocultar contraseña">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Error message -->
+                <div id="login-error" class="login-error hidden">
+                    <span>⚠️</span>
+                    <span id="login-error-text">Usuario o contraseña incorrectos</span>
+                </div>
+
+                <button type="submit" class="btn-login" id="btn-login">
+                    <span id="btn-login-text">Iniciar Sesión</span>
+                    <span id="btn-login-spinner" class="login-spinner hidden"></span>
+                </button>
+            </form>
+
+            <p class="login-footer">Finanzas Express &copy; 2026 · Acceso restringido</p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('login-form');
+        const errorBox = document.getElementById('login-error');
+        const errorText = document.getElementById('login-error-text');
+        const btnText = document.getElementById('btn-login-text');
+        const btnSpinner = document.getElementById('btn-login-spinner');
+        const togglePwd = document.getElementById('toggle-password');
+        const pwdInput = document.getElementById('login-password');
+
+        togglePwd.addEventListener('click', () => {
+            const isPassword = pwdInput.type === 'password';
+            pwdInput.type = isPassword ? 'text' : 'password';
+            togglePwd.textContent = isPassword ? '🙈' : '👁️';
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorBox.classList.add('hidden');
+            btnText.textContent = 'Verificando...';
+            btnSpinner.classList.remove('hidden');
+
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    btnText.textContent = '✅ ¡Bienvenido!';
+                    setTimeout(() => { window.location.href = '/'; }, 500);
+                } else {
+                    errorText.textContent = data.error || 'Usuario o contraseña incorrectos';
+                    errorBox.classList.remove('hidden');
+                    btnText.textContent = 'Iniciar Sesión';
+                    btnSpinner.classList.add('hidden');
+                    // Shake animation
+                    form.classList.add('login-shake');
+                    setTimeout(() => form.classList.remove('login-shake'), 500);
+                }
+            } catch (err) {
+                errorText.textContent = 'Error de conexión. Intenta de nuevo.';
+                errorBox.classList.remove('hidden');
+                btnText.textContent = 'Iniciar Sesión';
+                btnSpinner.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+
+</html>
