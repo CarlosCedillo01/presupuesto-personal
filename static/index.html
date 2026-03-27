@@ -34,8 +34,10 @@
                 🔑 Cerrar Sesión
             </button>
             <div class="month-selector">
-                <label for="global-month">Mes:</label>
-                <input type="month" id="global-month">
+                <button class="month-nav-btn" id="btn-prev-month" title="Mes anterior">◀</button>
+                <span class="month-display" id="month-display">Marzo 2026</span>
+                <button class="month-nav-btn" id="btn-next-month" title="Mes siguiente">▶</button>
+                <input type="month" id="global-month" class="month-hidden-input">
             </div>
         </div>
     </header>
@@ -110,19 +112,7 @@
                             <div class="form-group">
                                 <label for="tx-category">Categoría</label>
                                 <select id="tx-category" required>
-                                    <option value="Alimentación">🍔 Alimentación</option>
-                                    <option value="Transporte">🚗 Transporte</option>
-                                    <option value="Entretenimiento">🎬 Entretenimiento</option>
-                                    <option value="Educación">📚 Educación</option>
-                                    <option value="Salud">🏥 Salud</option>
-                                    <option value="Vivienda">🏠 Vivienda</option>
-                                    <option value="Ropa">👕 Ropa</option>
-                                    <option value="Servicios">💡 Servicios</option>
-                                    <option value="Salario">💼 Salario</option>
-                                    <option value="Freelance">💻 Freelance</option>
-                                    <option value="Inversiones">📈 Inversiones</option>
-                                    <option value="Caja de Ahorro">🏦 Caja de Ahorro</option>
-                                    <option value="Otro">📦 Otro</option>
+                                    <!-- Categorías se cargan dinámicamente según el tipo -->
                                 </select>
                             </div>
                         </div>
@@ -140,7 +130,7 @@
                                 <input type="date" id="tx-date" required>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary" id="btn-add-transaction">Agregar
+                        <button type="submit" class="btn btn-add-transaction" id="btn-add-transaction">Agregar
                             Transacción</button>
                     </form>
                 </div>

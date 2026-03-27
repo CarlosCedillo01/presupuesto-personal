@@ -45,6 +45,7 @@ def init_db():
             description TEXT,
             amount REAL NOT NULL CHECK(amount > 0),
             date TEXT NOT NULL,
+            hidden INTEGER NOT NULL DEFAULT 0,
             FOREIGN KEY (user_id) REFERENCES users(id)
         );
 
@@ -159,12 +160,12 @@ def get_transactions(user_id=1, month=None):
     conn = get_connection()
     if month:
         rows = conn.execute(
-            "SELECT * FROM transactions WHERE user_id = ? AND date LIKE ? ORDER BY date DESC",
+            "SELECT * FROM transactions WHERE user_id = ? AND date LIKE ? AND hidden = 0 ORDER BY date DESC",
             (user_id, f"{month}%")
         ).fetchall()
     else:
         rows = conn.execute(
-            "SELECT * FROM transactions WHERE user_id = ? ORDER BY date DESC",
+            "SELECT * FROM transactions WHERE user_id = ? AND hidden = 0 ORDER BY date DESC",
             (user_id,)
         ).fetchall()
     conn.close()
@@ -184,8 +185,9 @@ def add_transaction(user_id, t_type, category, description, amount, t_date):
 
 
 def delete_transaction(tid, user_id=1):
+    """Oculta la transacción de la lista pero la mantiene para reportes."""
     conn = get_connection()
-    conn.execute("DELETE FROM transactions WHERE id = ? AND user_id = ?", (tid, user_id))
+    conn.execute("UPDATE transactions SET hidden = 1 WHERE id = ? AND user_id = ?", (tid, user_id))
     conn.commit()
     conn.close()
 
@@ -265,16 +267,79 @@ def add_savings_goal(user_id, name, target_amount, deadline):
 
 def deposit_to_goal(goal_id, amount, user_id=1):
     conn = get_connection()
+    # Obtener el nombre de la meta para la descripción
+    goal = conn.execute(
+        "SELECT name FROM savings_goals WHERE id = ? AND user_id = ?",
+        (goal_id, user_id)
+    ).fetchone()
+    goal_name = goal['name'] if goal else 'Meta de ahorro'
+
+    # Actualizar monto de la meta
     conn.execute(
         "UPDATE savings_goals SET current_amount = current_amount + ? WHERE id = ? AND user_id = ?",
         (amount, goal_id, user_id)
     )
+
+    # Registrar como gasto en transacciones
+    conn.execute(
+        "INSERT INTO transactions (user_id, type, category, description, amount, date) VALUES (?, 'gasto', 'Ahorro', ?, ?, ?)",
+        (user_id, f'Caja de Ahorro: {goal_name}', amount, date.today().isoformat())
+    )
+
     conn.commit()
     conn.close()
 
 
+def withdraw_from_goal(goal_id, amount, user_id=1):
+    """Retira dinero de una meta de ahorro y lo devuelve al balance."""
+    conn = get_connection()
+    goal = conn.execute(
+        "SELECT name, current_amount FROM savings_goals WHERE id = ? AND user_id = ?",
+        (goal_id, user_id)
+    ).fetchone()
+
+    if not goal:
+        conn.close()
+        return False, 'Meta no encontrada'
+
+    if amount > goal['current_amount']:
+        conn.close()
+        return False, f'No puedes retirar más de ${goal["current_amount"]:.2f}'
+
+    goal_name = goal['name']
+
+    # Reducir monto de la meta
+    conn.execute(
+        "UPDATE savings_goals SET current_amount = current_amount - ? WHERE id = ? AND user_id = ?",
+        (amount, goal_id, user_id)
+    )
+
+    # Registrar como ingreso (devolver al balance)
+    conn.execute(
+        "INSERT INTO transactions (user_id, type, category, description, amount, date) VALUES (?, 'ingreso', 'Ahorro', ?, ?, ?)",
+        (user_id, f'Retiro de Caja de Ahorro: {goal_name}', amount, date.today().isoformat())
+    )
+
+    conn.commit()
+    conn.close()
+    return True, 'Retiro realizado'
+
+
 def delete_savings_goal(goal_id, user_id=1):
     conn = get_connection()
+    # Verificar si la meta tiene dinero acumulado
+    goal = conn.execute(
+        "SELECT name, current_amount FROM savings_goals WHERE id = ? AND user_id = ?",
+        (goal_id, user_id)
+    ).fetchone()
+
+    if goal and goal['current_amount'] > 0:
+        # Devolver el dinero al balance como ingreso
+        conn.execute(
+            "INSERT INTO transactions (user_id, type, category, description, amount, date) VALUES (?, 'ingreso', 'Ahorro', ?, ?, ?)",
+            (user_id, f'Devolución por cierre de meta: {goal["name"]}', goal['current_amount'], date.today().isoformat())
+        )
+
     conn.execute("DELETE FROM savings_goals WHERE id = ? AND user_id = ?", (goal_id, user_id))
     conn.commit()
     conn.close()

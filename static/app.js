@@ -11,11 +11,15 @@ const CATEGORIES_EXPENSE = [
     'Salud', 'Vivienda', 'Ropa', 'Servicios', 'Otro'
 ];
 
+const CATEGORIES_INCOME = [
+    'Salario', 'Freelance', 'Inversiones', 'Otro'
+];
+
 const CATEGORY_ICONS = {
     'Alimentación': '🍔', 'Transporte': '🚗', 'Entretenimiento': '🎬',
     'Educación': '📚', 'Salud': '🏥', 'Vivienda': '🏠', 'Ropa': '👕',
     'Servicios': '💡', 'Salario': '💼', 'Freelance': '💻',
-    'Inversiones': '📈', 'Otro': '📦'
+    'Inversiones': '📈', 'Ahorro': '🏦', 'Otro': '📦'
 };
 
 const CHART_COLORS = [
@@ -67,9 +71,42 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function initMonthSelector() {
     const monthInput = document.getElementById('global-month');
+    const monthDisplay = document.getElementById('month-display');
+    const btnPrev = document.getElementById('btn-prev-month');
+    const btnNext = document.getElementById('btn-next-month');
     const now = new Date();
+
+    // Set initial value
     monthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    monthInput.addEventListener('change', () => loadAllData());
+    updateMonthDisplay();
+
+    btnPrev.addEventListener('click', () => changeMonth(-1));
+    btnNext.addEventListener('click', () => changeMonth(1));
+    monthInput.addEventListener('change', () => {
+        updateMonthDisplay();
+        loadAllData();
+    });
+}
+
+function changeMonth(delta) {
+    const monthInput = document.getElementById('global-month');
+    const [year, month] = monthInput.value.split('-').map(Number);
+    const d = new Date(year, month - 1 + delta, 1);
+    monthInput.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    updateMonthDisplay();
+    loadAllData();
+}
+
+const MONTH_NAMES = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+];
+
+function updateMonthDisplay() {
+    const monthInput = document.getElementById('global-month');
+    const monthDisplay = document.getElementById('month-display');
+    const [year, month] = monthInput.value.split('-').map(Number);
+    monthDisplay.textContent = `${MONTH_NAMES[month - 1]} ${year}`;
 }
 
 function getSelectedMonth() {
@@ -130,6 +167,11 @@ function initForms() {
 
     // Set default date
     document.getElementById('tx-date').value = new Date().toISOString().split('T')[0];
+
+    // Filtrar categorías según tipo de transacción
+    const txType = document.getElementById('tx-type');
+    txType.addEventListener('change', () => updateCategoryOptions(txType.value));
+    updateCategoryOptions(txType.value); // carga inicial
 
     // Budget form
     document.getElementById('budget-form').addEventListener('submit', async (e) => {
@@ -584,7 +626,7 @@ function renderSavingsGoals(goals) {
         container.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">🏦</div>
-                <p>No hay metas de ahorro. ¡Crea una!</p>
+                <p>No hay metas de ahorro</p>
             </div>`;
         return;
     }
@@ -617,6 +659,7 @@ function renderSavingsGoals(goals) {
                 <div class="savings-goal-actions">
                     <input type="number" class="deposit-input" id="deposit-${g.id}" placeholder="Monto" min="1" step="0.01">
                     <button class="btn btn-sm btn-deposit" onclick="depositToGoal(${g.id})">💵 Depositar</button>
+                    <button class="btn btn-sm btn-withdraw" onclick="withdrawFromGoal(${g.id})">💸 Retirar</button>
                     <button class="btn btn-sm btn-danger" onclick="deleteSavingsGoal(${g.id})">✕</button>
                 </div>
             </div>`;
@@ -742,7 +785,7 @@ async function depositToGoal(goalId) {
         if (!res.ok) throw new Error((await res.json()).error);
         showToast(`Depósito de $${formatNumber(amount)} realizado`, 'success');
         input.value = '';
-        loadSavingsGoals();
+        loadAllData();
     } catch (err) {
         showToast(`Error: ${err.message}`, 'error');
     }
@@ -757,6 +800,44 @@ async function deleteSavingsGoal(goalId) {
     } catch (err) {
         showToast('Error al eliminar', 'error');
     }
+}
+
+async function withdrawFromGoal(goalId) {
+    const input = document.getElementById(`deposit-${goalId}`);
+    const amount = parseFloat(input.value);
+
+    if (!amount || amount <= 0) {
+        showToast('Ingresa un monto válido para retirar', 'error');
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/savings/${goalId}/withdraw`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        showToast(`Retiro de $${formatNumber(amount)} realizado`, 'success');
+        input.value = '';
+        loadAllData();
+    } catch (err) {
+        showToast(`Error: ${err.message}`, 'error');
+    }
+}
+
+// ============================================================
+// Category Filtering
+// ============================================================
+
+function updateCategoryOptions(type) {
+    const select = document.getElementById('tx-category');
+    const categories = type === 'ingreso' ? CATEGORIES_INCOME : CATEGORIES_EXPENSE;
+    select.innerHTML = categories.map(cat => {
+        const icon = CATEGORY_ICONS[cat] || '📦';
+        return `<option value="${cat}">${icon} ${cat}</option>`;
+    }).join('');
 }
 
 // ============================================================

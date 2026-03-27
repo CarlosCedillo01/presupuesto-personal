@@ -115,7 +115,7 @@ body::before {
 #app-header h1 {
     font-size: 1.4rem;
     font-weight: 700;
-    background: var(--gradient-primary);
+    background: red;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -123,7 +123,11 @@ body::before {
 
 .header-subtitle {
     font-size: 0.8rem;
-    color: var(--text-muted);
+    color: red;
+}
+
+.card-header {
+    background-color: red;
 }
 
 .guest-badge {
@@ -137,30 +141,67 @@ body::before {
 .month-selector {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
-.month-selector label {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-.month-selector input[type="month"] {
+.month-nav-btn {
     background: var(--glass);
     border: 1px solid var(--glass-border);
     color: var(--text-primary);
-    padding: 8px 14px;
+    width: 34px;
+    height: 34px;
     border-radius: var(--radius-sm);
-    font-family: var(--font);
     font-size: 0.85rem;
-    outline: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: var(--transition);
 }
 
-.month-selector input[type="month"]:focus {
+.month-nav-btn:hover {
+    background: rgba(99, 102, 241, 0.15);
     border-color: var(--accent-1);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    transform: scale(1.05);
+}
+
+.month-nav-btn:active {
+    transform: scale(0.95);
+}
+
+.month-display {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 140px;
+    text-align: center;
+    padding: 6px 12px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    letter-spacing: 0.3px;
+}
+
+.month-hidden-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+}
+
+/* Iconos de calendario visibles en tema oscuro */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="month"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.8) brightness(1.4);
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="month"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
 }
 
 /* ---- Alerts Banner ---- */
@@ -493,6 +534,16 @@ body::before {
     background: rgba(16, 185, 129, 0.25);
 }
 
+.btn-withdraw {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--info);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.btn-withdraw:hover {
+    background: rgba(59, 130, 246, 0.25);
+}
+
 .btn-reset {
     background: rgba(239, 68, 68, 0.12);
     color: var(--danger);
@@ -522,6 +573,17 @@ body::before {
     display: flex;
     align-items: center;
     gap: 12px;
+}
+
+.btn-add-transaction {
+    background: linear-gradient(135deg, #960505, #b91010);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(185, 16, 16, 0.25);
+}
+
+.btn-add-transaction:hover {
+    box-shadow: 0 6px 20px rgba(185, 16, 16, 0.35);
+    transform: translateY(-1px);
 }
 
 /* ---- KPI Grid ---- */
@@ -1144,8 +1206,13 @@ body::before {
 }
 
 @keyframes blobMove {
-    from { transform: translate(0, 0) scale(1); }
-    to   { transform: translate(40px, 30px) scale(1.08); }
+    from {
+        transform: translate(0, 0) scale(1);
+    }
+
+    to {
+        transform: translate(40px, 30px) scale(1.08);
+    }
 }
 
 /* Card */
@@ -1262,8 +1329,25 @@ body::before {
     cursor: pointer;
     font-size: 1rem;
     opacity: 0.6;
-    transition: opacity 0.2s;
+    transition: 0.1 ease;
     padding: 4px;
+    color: white;
+}
+
+.lucide-eye-icon,
+.lucide-eye-closed-icon {
+    width: 20px;
+    /* Tamaño fijo para el SVG */
+    height: 20px;
+}
+
+.lucide-eye-closed-icon {
+    display: none;
+}
+
+.lucide-eye-closed-icon,
+.lucide-eye-icon {
+    pointer-events: none;
 }
 
 .login-toggle-password:hover {
@@ -1333,16 +1417,34 @@ body::before {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Shake on error */
 @keyframes loginShake {
-    0%, 100% { transform: translateX(0); }
-    20%       { transform: translateX(-8px); }
-    40%       { transform: translateX(8px); }
-    60%       { transform: translateX(-5px); }
-    80%       { transform: translateX(5px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-8px);
+    }
+
+    40% {
+        transform: translateX(8px);
+    }
+
+    60% {
+        transform: translateX(-5px);
+    }
+
+    80% {
+        transform: translateX(5px);
+    }
 }
 
 .login-shake {

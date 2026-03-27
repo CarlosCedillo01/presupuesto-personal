@@ -47,7 +47,23 @@
                             required autocomplete="current-password">
                         <button type="button" class="login-toggle-password" id="toggle-password"
                             title="Mostrar/ocultar contraseña">
-                            👁️
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-eye-icon lucide-eye">
+                                <path
+                                    d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-eye-closed-icon lucide-eye-closed">
+                                <path d="m15 18-.722-3.25" />
+                                <path d="M2 8a10.645 10.645 0 0 0 20 0" />
+                                <path d="m20 15-1.726-2.05" />
+                                <path d="m4 15 1.726-2.05" />
+                                <path d="m9 18 .722-3.25" />
+                            </svg>
                         </button>
                     </div>
                 </div>
@@ -76,11 +92,27 @@
         const btnSpinner = document.getElementById('btn-login-spinner');
         const togglePwd = document.getElementById('toggle-password');
         const pwdInput = document.getElementById('login-password');
+        const eyeIcon = togglePwd.querySelector('.lucide-eye-icon');
+        const eyeClosedIcon = togglePwd.querySelector('.lucide-eye-closed-icon');
+
 
         togglePwd.addEventListener('click', () => {
+            // 1. Verificamos el estado actual
             const isPassword = pwdInput.type === 'password';
+
+            // 2. Alternamos el tipo de input
             pwdInput.type = isPassword ? 'text' : 'password';
-            togglePwd.textContent = isPassword ? '🙈' : '👁️';
+
+            // 3. Mostramos/Ocultamos los iconos según el estado
+            if (isPassword) {
+                // Si era password (ahora es texto visible), ocultamos el ojo abierto y mostramos el cerrado
+                eyeIcon.style.display = 'none';
+                eyeClosedIcon.style.display = 'block'; // o 'inline-block' dependiendo de tu diseño
+            } else {
+                // Si era texto (ahora es password oculto), mostramos el ojo abierto y ocultamos el cerrado
+                eyeIcon.style.display = 'block';
+                eyeClosedIcon.style.display = 'none';
+            }
         });
 
         form.addEventListener('submit', async (e) => {

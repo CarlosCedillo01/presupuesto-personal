@@ -275,6 +275,26 @@ def deposit_to_goal(gid):
     return jsonify({'message': 'Depósito realizado'})
 
 
+@app.route('/api/savings/<int:gid>/withdraw', methods=['POST'])
+@require_login
+def withdraw_from_goal(gid):
+    data = request.get_json()
+    if 'amount' not in data:
+        return jsonify({'error': 'Campo requerido: amount'}), 400
+
+    try:
+        amount = float(data['amount'])
+        if amount <= 0:
+            raise ValueError
+    except (ValueError, TypeError):
+        return jsonify({'error': 'El monto debe ser un número positivo'}), 400
+
+    success, message = db.withdraw_from_goal(gid, amount, user_id=current_user_id())
+    if not success:
+        return jsonify({'error': message}), 400
+    return jsonify({'message': message})
+
+
 @app.route('/api/savings/<int:gid>', methods=['DELETE'])
 @require_login
 def delete_savings_goal(gid):
@@ -294,7 +314,7 @@ def export_csv():
 
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(['ID', 'Tipo', 'Categoría', 'Descripción', 'Monto', 'Fecha'])
+    writer.writerow(['ID', 'Tipo', 'Categoria', 'Descripcion', 'Monto', 'Fecha'])
 
     for t in transactions:
         writer.writerow([t['id'], t['type'], t['category'], t['description'], t['amount'], t['date']])
