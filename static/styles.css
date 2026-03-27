@@ -126,9 +126,7 @@ body::before {
     color: var(--text-muted);
 }
 
-.card-header {
-    background-color: red;
-}
+
 
 .guest-badge {
     background: var(--glass);
