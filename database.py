@@ -73,8 +73,16 @@ def init_db():
 
     # Usuarios predefinidos: (id, nombre, username, contraseña)
     PREDEFINED_USERS = [
-        (1, 'Usuario 01', 'usuario01', 'finanzas2024'),
-        (2, 'Usuario 02', 'usuario02', 'express2024'),
+        (1, 'Usuario 01', 'usuario01', 'finanzas2026'),
+        (2, 'Usuario 02', 'usuario02', 'express2026'),
+        (3, 'Usuario 03', 'usuario03', 'ahorro2026'),
+        (4, 'Usuario 04', 'usuario04', 'balance2026'),
+        (5, 'Usuario 05', 'usuario05', 'gastos2026'),
+        (6, 'Usuario 06', 'usuario06', 'ingreso2026'),
+        (7, 'Usuario 07', 'usuario07', 'meta2026'),
+        (8, 'Usuario 08', 'usuario08', 'cuenta2026'),
+        (9, 'Usuario 09', 'usuario09', 'dinero2026'),
+        (10, 'Usuario 10', 'usuario10', 'budget2026'),
     ]
 
     for uid, name, username, password in PREDEFINED_USERS:
