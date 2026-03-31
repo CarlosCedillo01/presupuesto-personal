@@ -1459,8 +1459,8 @@ input[type="month"]::-webkit-calendar-picker-indicator:hover {
 
 /* Logout button */
 .btn-logout {
-    background: rgba(99, 102, 241, 0.12);
-    color: var(--accent-3);
+    background: red;
+    color: black;
     border: 1px solid rgba(99, 102, 241, 0.2);
     padding: 8px 18px;
     border-radius: var(--radius-sm);
