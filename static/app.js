@@ -94,6 +94,9 @@ function changeMonth(delta) {
     const d = new Date(year, month - 1 + delta, 1);
     monthInput.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     updateMonthDisplay();
+    // Sincronizar fecha del formulario con el mes seleccionado
+    const txDate = document.getElementById('tx-date');
+    if (txDate) txDate.value = getDefaultDate();
     loadAllData();
 }
 
@@ -107,6 +110,20 @@ function updateMonthDisplay() {
     const monthDisplay = document.getElementById('month-display');
     const [year, month] = monthInput.value.split('-').map(Number);
     monthDisplay.textContent = `${MONTH_NAMES[month - 1]} ${year}`;
+}
+
+function getDefaultDate() {
+    const selected = getSelectedMonth(); // "YYYY-MM"
+    const today = new Date();
+    const localYear = today.getFullYear();
+    const localMonth = String(today.getMonth() + 1).padStart(2, '0');
+    const localDay = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${localYear}-${localMonth}-${localDay}`;
+    const todayMonth = `${localYear}-${localMonth}`;
+    if (selected === todayMonth) {
+        return todayStr;
+    }
+    return `${selected}-01`;
 }
 
 function getSelectedMonth() {
@@ -157,16 +174,17 @@ function initForms() {
             if (!res.ok) throw new Error((await res.json()).error);
             showToast('Transacción registrada exitosamente', 'success');
             e.target.reset();
-            // Reset date to today
-            document.getElementById('tx-date').value = new Date().toISOString().split('T')[0];
+            // Reset date to match selected month
+            document.getElementById('tx-date').value = getDefaultDate();
+            updateCategoryOptions(document.getElementById('tx-type').value);
             loadAllData();
         } catch (err) {
             showToast(`Error: ${err.message}`, 'error');
         }
     });
 
-    // Set default date
-    document.getElementById('tx-date').value = new Date().toISOString().split('T')[0];
+    // Set default date matching selected month
+    document.getElementById('tx-date').value = getDefaultDate();
 
     // Filtrar categorías según tipo de transacción
     const txType = document.getElementById('tx-type');
