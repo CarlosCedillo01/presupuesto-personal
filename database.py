@@ -9,6 +9,8 @@ from datetime import datetime, date
 from werkzeug.security import generate_password_hash, check_password_hash
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "budget.db")
+# ARCH_REVIEW: Validación de base de Datos de SQLite v1.0.
+
 
 def get_connection():
     """Obtiene una conexión a la base de datos."""
